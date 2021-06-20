@@ -24,13 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
-
-        $data = [
-            'posts' => $posts
-        ];
-
-
-        return view('guest.home', $data);
+        
+        return view('guest.home');
     }
 }
