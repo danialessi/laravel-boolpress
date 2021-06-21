@@ -46,10 +46,36 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        // validazione
+        $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required|max:60000'
+        ]);
+
         // con questa funzione ricevo i dati dal form contenuto in create (attraverso $request) e li salvo in una variabile
         // return: la view relativa al post appena creato 
         $form_data = $request->all();
-        
+
+        // CREAZIONE SLUG
+        // slug del post creato 
+        $new_slug = Str::slug($form_data['title'], '-');
+        $base_slug = $new_slug;
+
+        // con questa query controllo che non esista già uno slug uguale 
+        $existing_post_with_slug = Post::where('slug', '=', $new_slug)->first();
+        $counter = 1;
+
+        // attraverso un ciclo, nel caso in cui trovassi uno slug uguale, allo slug di base aggiungo un numero (counter)
+        while($existing_post_with_slug) {
+            $new_slug = $base_slug . '-' . $counter;
+            // provo con un altro slug 
+            $counter++;
+
+            $existing_post_with_slug = Post::where('slug', '=', $new_slug)->first();
+        }
+
+        $form_data['slug'] = $new_slug;
+
         // in questa variabile aggiungo una nuova istanza di Post (corrispondente ad una nuova riga nel DB)
         $new_post = new Post();
 
@@ -57,7 +83,7 @@ class PostController extends Controller
         $new_post->fill($form_data);
         $new_post->save();
 
-        return redirect()->route('admin.posts.show', ['post' => $post->id]);
+        return redirect()->route('admin.posts.show', ['post' => $new_post->id]);
     }
 
     /**
@@ -87,7 +113,15 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        //
+        // con questa funzione si ricava il post tramite id per andarlo a modificare
+        // return: la view con il form di modifica del post 
+        $post = Post::findOrFail($id);
+
+        $data = [
+            'post' => $post
+        ];
+
+        return view('admin.posts.edit', $data);
     }
 
     /**
@@ -99,7 +133,22 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // validazione
+        $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required|max:60000'
+        ]);
+
+        // devo richiamare i dati del form del post modificato su create 
+        $form_data = $request->all();
+
+        // richiamo il post da modificare tramite id
+        $post_to_modify = Post::find($id);
+
+        // aggiorno i dati del post con quelli del form
+        $post_to_modify->update($form_data);
+
+        return redirect()->route('admin.posts.show', ['post' => $post_to_modify->id]);
     }
 
     /**
@@ -110,6 +159,12 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // ricavo il post da eliminare tramite id
+        $post_to_delete = Post::find($id);
+
+        // gli aggiungo il metodo delete
+        $post_to_delete->delete();
+
+        return redirect()->route('admin.posts.index');
     }
 }

@@ -11,6 +11,15 @@
                 <h5 class="card-title">{{ $post->title }}</h5>
                 <p class="card-text">{{ substr($post->content, 0, 80) }}...</p>
                 <a href="{{ route('admin.posts.show', ['post' => $post->id ]) }}" class="btn btn-primary">Vedi dettagli post</a>
+                <a href="{{ route('admin.posts.edit', ['post' => $post->id ]) }}" class="mt-1 btn btn-secondary">Modifica post</a>
+                
+                {{-- per il bottone "cancella" si deve creare un form travestito da button per potergli passare il metodo delete richiesto --}}
+                <form action="{{ route('admin.posts.destroy', ['post' => $post->id]) }}" method="post">
+                @csrf
+                @method('DELETE')
+
+                <input type="submit" class="mt-1 btn btn-danger" value="Elimina post">
+                </form>
                 </div>
             </div>
             @endforeach
