@@ -56,7 +56,8 @@ class PostController extends Controller
         // validazione
         $request->validate([
             'title' => 'required|max:255',
-            'content' => 'required|max:60000'
+            'content' => 'required|max:60000',
+            'category_id' => 'nullable|exists:categories,id'
         ]);
 
         // con questa funzione ricevo i dati dal form contenuto in create (attraverso $request) e li salvo in una variabile
@@ -145,7 +146,8 @@ class PostController extends Controller
         // validazione
         $request->validate([
             'title' => 'required|max:255',
-            'content' => 'required|max:60000'
+            'content' => 'required|max:60000',
+            'category_id' => 'nullable|exists:categories,id'
         ]);
 
         // devo richiamare i dati del form del post modificato su create 
