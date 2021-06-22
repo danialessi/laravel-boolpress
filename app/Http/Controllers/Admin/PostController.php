@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
+use App\Category;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -34,8 +35,14 @@ class PostController extends Controller
      */
     public function create()
     {
+        $categories = Category::all();
+
+        $data = [
+            'categories' => $categories
+        ];
+
         // return: la view con il form
-        return view('admin.posts.create');
+        return view('admin.posts.create', $data);
     }
 
     /**
@@ -144,6 +151,29 @@ class PostController extends Controller
 
         // richiamo il post da modificare tramite id
         $post_to_modify = Post::find($id);
+
+        // di default lo slug non cambia se non cambia il titolo
+        $form_data['slug'] = $post->slug;
+
+        if($form_data['title'] != $post->title) {
+            $new_slug = Str::slug($form_data['title'], '-');
+            $base_slug = $new_slug;
+
+            // con questa query controllo che non esista già uno slug uguale 
+            $existing_post_with_slug = Post::where('slug', '=', $new_slug)->first();
+            $counter = 1;
+
+            // attraverso un ciclo, nel caso in cui trovassi uno slug uguale, allo slug di base aggiungo un numero (counter)
+            while($existing_post_with_slug) {
+                $new_slug = $base_slug . '-' . $counter;
+                // provo con un altro slug 
+                $counter++;
+
+                $existing_post_with_slug = Post::where('slug', '=', $new_slug)->first();
+            }
+
+            $form_data['slug'] = $new_slug;
+        }
 
         // aggiorno i dati del post con quelli del form
         $post_to_modify->update($form_data);
