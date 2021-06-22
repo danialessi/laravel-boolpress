@@ -123,9 +123,11 @@ class PostController extends Controller
         // con questa funzione si ricava il post tramite id per andarlo a modificare
         // return: la view con il form di modifica del post 
         $post = Post::findOrFail($id);
+        $categories = Category::all();
 
         $data = [
-            'post' => $post
+            'post' => $post,
+            'categories' => $categories
         ];
 
         return view('admin.posts.edit', $data);
@@ -153,9 +155,9 @@ class PostController extends Controller
         $post_to_modify = Post::find($id);
 
         // di default lo slug non cambia se non cambia il titolo
-        $form_data['slug'] = $post->slug;
+        $form_data['slug'] = $post_to_modify->slug;
 
-        if($form_data['title'] != $post->title) {
+        if($form_data['title'] != $post_to_modify->title) {
             $new_slug = Str::slug($form_data['title'], '-');
             $base_slug = $new_slug;
 
