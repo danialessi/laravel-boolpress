@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-    /**
+    /** INDEX
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -28,7 +28,7 @@ class PostController extends Controller
         return view('admin.posts.index', $data);
     }
 
-    /**
+    /** CREATE
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -45,7 +45,7 @@ class PostController extends Controller
         return view('admin.posts.create', $data);
     }
 
-    /**
+    /** STORE
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -94,7 +94,7 @@ class PostController extends Controller
         return redirect()->route('admin.posts.show', ['post' => $new_post->id]);
     }
 
-    /**
+    /** SHOW
      * Display the specified resource.
      *
      * @param  int  $id
@@ -107,13 +107,14 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
 
         $data = [
-            'post' => $post
+            'post' => $post,
+            'post_tags' => $post->tags
         ];
 
         return view('admin.posts.show', $data);
     }
 
-    /**
+    /** EDIT
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -134,7 +135,7 @@ class PostController extends Controller
         return view('admin.posts.edit', $data);
     }
 
-    /**
+    /** UPDATE
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -185,7 +186,7 @@ class PostController extends Controller
         return redirect()->route('admin.posts.show', ['post' => $post_to_modify->id]);
     }
 
-    /**
+    /** DESTROY
      * Remove the specified resource from storage.
      *
      * @param  int  $id

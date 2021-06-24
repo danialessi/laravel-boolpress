@@ -7,10 +7,17 @@
 
         {{-- se la categoria è popolata stampala  --}}
         @if($post->category)
-        <h5>Categoria: {{ $post->category->name }}</h5>
+        <div class="mt-2 mb-2"><strong>Categoria: </strong>{{ $post->category->name }}</div>
         @endif
 
-        <div class="mt-3 mb-3"><strong>Slug: </strong>{{ $post->slug}}</div>
+        <div class="mt-2 mb-2">
+            <strong>Tags: </strong>
+            @foreach($post_tags as $tag)
+                {{ $tag->name }} {{ $loop->last ? '' : ', ' }}
+            @endforeach
+        </div>
+
+        <div class="mt-2 mb-2"><strong>Slug: </strong>{{ $post->slug}}</div>
 
         <p>{{ $post->content }}</p>
 
