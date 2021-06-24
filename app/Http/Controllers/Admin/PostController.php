@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
 use App\Category;
+use App\Tag;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -36,9 +37,11 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
+        $tags = Tag::all();
 
         $data = [
-            'categories' => $categories
+            'categories' => $categories,
+            'tags' => $tags
         ];
 
         // return: la view con il form
@@ -53,17 +56,19 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        
         // validazione
         $request->validate([
             'title' => 'required|max:255',
             'content' => 'required|max:60000',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'tags' => 'nullable|exists:tags,id'
         ]);
 
         // con questa funzione ricevo i dati dal form contenuto in create (attraverso $request) e li salvo in una variabile
         // return: la view relativa al post appena creato 
         $form_data = $request->all();
-
+        
         // CREAZIONE SLUG
         // slug del post creato 
         $new_slug = Str::slug($form_data['title'], '-');
@@ -89,8 +94,14 @@ class PostController extends Controller
 
         // salvo i dati nel database
         $new_post->fill($form_data);
+        
         $new_post->save();
 
+        // gestione in caso non si aggiungano tag al form
+        if(isset($form_data['tags'])) {
+            $new_post->tags()->sync($form_data['tags']);
+        }
+        
         return redirect()->route('admin.posts.show', ['post' => $new_post->id]);
     }
 
@@ -126,10 +137,12 @@ class PostController extends Controller
         // return: la view con il form di modifica del post 
         $post = Post::findOrFail($id);
         $categories = Category::all();
+        $tags = Tag::all();
 
         $data = [
             'post' => $post,
-            'categories' => $categories
+            'categories' => $categories,
+            'tags' => $tags
         ];
 
         return view('admin.posts.edit', $data);
@@ -148,7 +161,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'required|max:255',
             'content' => 'required|max:60000',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
+            'tags' => 'nullable|exists:tags,id'
         ]);
 
         // devo richiamare i dati del form del post modificato su create 
@@ -183,6 +197,14 @@ class PostController extends Controller
         // aggiorno i dati del post con quelli del form
         $post_to_modify->update($form_data);
 
+        // gestione in caso non si aggiungano tag al form
+        if(isset($form_data['tags'])) {
+            $post_to_modify->tags()->sync($form_data['tags']);
+        } else {
+            // se non si seleziona nessun tag fai il sync di un array vuoto
+            $post_to_modify->tags()->sync([]);
+        }
+
         return redirect()->route('admin.posts.show', ['post' => $post_to_modify->id]);
     }
 
@@ -197,8 +219,13 @@ class PostController extends Controller
         // ricavo il post da eliminare tramite id
         $post_to_delete = Post::find($id);
 
+        // prima di cancellare l'elemento devo svuotare la relazione tra le tabelle
+        $post_to_delete->tags()->sync([]);
+
         // gli aggiungo il metodo delete
         $post_to_delete->delete();
+
+        
 
         return redirect()->route('admin.posts.index');
     }
