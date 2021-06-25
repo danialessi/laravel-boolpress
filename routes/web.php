@@ -21,6 +21,10 @@ Route::get('/', 'HomeController@index')->name('home');
 Route::get('/blog', 'PostController@index')->name('blog');
 Route::get('/blog/{slug}', 'PostController@show')->name('post-page');
 
+// post con vueJS 
+Route::get('/vue-posts', 'PostController@vuePosts')->name('vue-posts');
+
+// gestione post da amministatore
 Route::prefix('admin')
     ->namespace('Admin')
     ->name('admin.')
