@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Post;
 use App\Category;
 use App\Tag;
@@ -88,6 +89,19 @@ class PostController extends Controller
         }
 
         $form_data['slug'] = $new_slug;
+
+        // se l'utente carica un'immagine, la salvo in storage e aggiungo il path al DB
+        // abbiamo usato il nome cover-image (e non 'cover' come il nome della colonna) per i dati del form perchè devo prima manipolare l'istanza e poi andarla a salvare nella colonna del DB 
+        if(isset($form_data['cover-image'])) {
+
+            
+            $new_img_path = Storage::put('posts-cover', $form_data['cover-image']);
+
+            // dd($new_img_path);
+            if($new_img_path) {
+                $form_data['cover'] = $new_img_path;
+            }
+        }
 
         // in questa variabile aggiungo una nuova istanza di Post (corrispondente ad una nuova riga nel DB)
         $new_post = new Post();
