@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Post;
 use App\Category;
 use App\Tag;
+use App\Mail\NewPostNotification;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class PostController extends Controller
@@ -116,6 +118,9 @@ class PostController extends Controller
         if(isset($form_data['tags'])) {
             $new_post->tags()->sync($form_data['tags']);
         }
+
+        // MAIL amministratore
+        Mail::to('daniele@email.it')->send(new NewPostNotification());
         
         return redirect()->route('admin.posts.show', ['post' => $new_post->id]);
     }
