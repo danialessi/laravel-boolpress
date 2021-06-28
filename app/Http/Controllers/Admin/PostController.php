@@ -63,7 +63,8 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'content' => 'required|max:60000',
             'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            'cover-image' => 'image'
         ]);
 
         // con questa funzione ricevo i dati dal form contenuto in create (attraverso $request) e li salvo in una variabile
@@ -90,11 +91,11 @@ class PostController extends Controller
 
         $form_data['slug'] = $new_slug;
 
+
         // se l'utente carica un'immagine, la salvo in storage e aggiungo il path al DB
         // abbiamo usato il nome cover-image (e non 'cover' come il nome della colonna) per i dati del form perchè devo prima manipolare l'istanza e poi andarla a salvare nella colonna del DB 
         if(isset($form_data['cover-image'])) {
 
-            
             $new_img_path = Storage::put('posts-cover', $form_data['cover-image']);
 
             // dd($new_img_path);
@@ -176,7 +177,8 @@ class PostController extends Controller
             'title' => 'required|max:255',
             'content' => 'required|max:60000',
             'category_id' => 'nullable|exists:categories,id',
-            'tags' => 'nullable|exists:tags,id'
+            'tags' => 'nullable|exists:tags,id',
+            // 'cover-image' => 'image'
         ]);
 
         // devo richiamare i dati del form del post modificato su create 
@@ -206,6 +208,16 @@ class PostController extends Controller
             }
 
             $form_data['slug'] = $new_slug;
+        }
+
+        if(isset($form_data['cover-image'])) {
+
+            $img_path = Storage::put('posts-cover', $form_data['cover-image']);
+
+            if($img_path) {
+                $form_data['cover'] = $img_path;
+            }
+            
         }
 
         // aggiorno i dati del post con quelli del form

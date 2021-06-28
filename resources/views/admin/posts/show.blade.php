@@ -5,6 +5,10 @@
         
         <h2>{{ $post->title }}</h2>
 
+        @if($post->cover)
+        <img src="{{ asset('storage/' . $post->cover)}}" alt="{{ $post->title }}">
+        @endif
+
         {{-- se la categoria è popolata stampala  --}}
         @if($post->category)
         <div class="mt-2 mb-2"><strong>Categoria: </strong>{{ $post->category->name }}</div>

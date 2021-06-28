@@ -14,7 +14,7 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.posts.update', ['post' => $post->id]) }}" method="post">
+        <form action="{{ route('admin.posts.update', ['post' => $post->id]) }}" method="post" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
@@ -50,7 +50,19 @@
 
             </div>
 
-            <input type="submit" class="btn btn-primary" value="Salva">
+            <div class="form-group">
+                <label for="cover-image">Immagine</label>
+                <input type="file" class="form-control-file" name="cover-image" id="cover-image">
+            </div>
+
+            @if ($post->cover)
+                <h4>Anteprima</h4>
+                <img class="mb-2" src="{{ asset('storage/' . $post->cover)}}" alt="{{ $post->title }}">
+            @endif
+
+            <div>
+                <input type="submit" class="btn btn-primary" value="Salva">
+            </div>
         </form>
     </div>
 @endsection
